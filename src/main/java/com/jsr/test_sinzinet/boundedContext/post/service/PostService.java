@@ -55,5 +55,11 @@ public class PostService {
         );
     }
 
+    // 게시글 삭제
+    public void delete(Post post) {
+        postRepository.delete(post);
+    }
+
+
 
 }

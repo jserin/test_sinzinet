@@ -131,4 +131,31 @@ public class PostController {
                 new ModifyResponse(modifyRs.getData())
         );
     }
+
+    @AllArgsConstructor
+    @Getter
+    public static class DeleteResponse {
+        private final Post post;
+    }
+
+    // 게시글 삭제
+    @DeleteMapping(value = "/{postNo}")
+    public RsData<DeleteResponse> delete(@PathVariable(name = "postNo") Integer postNo) {
+        Optional<Post> opPost = postService.findByPostNo(postNo);
+
+        if (opPost.isEmpty()) return RsData.of(
+                "F-1",
+                "%d번 게시물은 존재하지 않습니다.".formatted(postNo),
+                null
+        );
+
+        postService.delete(opPost.get());
+
+        return RsData.of(
+                "S-1",
+                "%d번 게시물 삭제 성공".formatted(postNo),
+                null
+        );
+
+    }
 }

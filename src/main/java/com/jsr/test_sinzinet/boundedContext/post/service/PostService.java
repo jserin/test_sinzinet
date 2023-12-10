@@ -59,7 +59,4 @@ public class PostService {
     public void delete(Post post) {
         postRepository.delete(post);
     }
-
-
-
 }

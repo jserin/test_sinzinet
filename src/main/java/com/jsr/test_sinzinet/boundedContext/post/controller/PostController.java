@@ -5,6 +5,7 @@ import com.jsr.test_sinzinet.boundedContext.boardDef.entity.BoardDef;
 import com.jsr.test_sinzinet.boundedContext.boardDef.service.BoardDefService;
 import com.jsr.test_sinzinet.boundedContext.post.entity.Post;
 import com.jsr.test_sinzinet.boundedContext.post.service.PostService;
+import com.jsr.test_sinzinet.boundedContext.postTag.entity.PostTag;
 import com.jsr.test_sinzinet.boundedContext.postTag.service.PostTagService;
 import com.jsr.test_sinzinet.boundedContext.tag.entity.Tag;
 import com.jsr.test_sinzinet.boundedContext.tag.service.TagService;
@@ -94,16 +95,19 @@ public class PostController {
 
         if (createRs.isFail()) return (RsData) createRs;
 
+        // 태그가 있는 경우 실행
         if (createRequest.tagName != null) {
             for (String tag : createRequest.getTagName()) {
+                // tag 테이블에 없으면 생성
                 Optional<Tag> opTag = tagService.findByTagAndBoardDef(tag, boardDef);
                 if (opTag.isEmpty()){
                     tagService.create(boardDef, tag);
                 }
 
-                Optional<Tag> exitTag = tagService.findByTagAndBoardDef(tag, boardDef);
-                if (exitTag.isPresent()) {
-                    postTagService.create(createRs.getData(), boardDef, exitTag.get());
+                // posttag 생성
+                Optional<Tag> existTag = tagService.findByTagAndBoardDef(tag, boardDef);
+                if (existTag.isPresent()) {
+                    postTagService.create(createRs.getData(), boardDef, existTag.get());
                 }
             }
         }
@@ -122,6 +126,7 @@ public class PostController {
         private String postSj;
         @NotBlank
         private String postCn;
+        private String[] tagName;
     }
 
     @AllArgsConstructor
@@ -145,6 +150,32 @@ public class PostController {
 
         RsData<Post> modifyRs = postService.modify(opPost.get(), modifyRequest.getPostSj(), modifyRequest.getPostCn());
 
+        List<PostTag> postTags = postTagService.findByPost(modifyRs.getData());
+
+        // 게시글 태그 삭제
+        if (postTags != null) {
+            for (PostTag postTag: postTags) {
+                postTagService.delete(postTag);
+            }
+        }
+
+        // 게시글 태그 재생성
+        if (modifyRequest.tagName != null) {
+            for (String tag : modifyRequest.getTagName()) {
+                // tag 테이블에 없으면 생성
+                Optional<Tag> opTag = tagService.findByTagAndBoardDef(tag, opPost.get().getBoardDef());
+                if (opTag.isEmpty()){
+                    tagService.create(opPost.get().getBoardDef(), tag);
+                }
+
+                // posttag 생성
+                Optional<Tag> existTag = tagService.findByTagAndBoardDef(tag, opPost.get().getBoardDef());
+                if (existTag.isPresent()) {
+                    postTagService.create(opPost.get(), opPost.get().getBoardDef(), existTag.get());
+                }
+            }
+        }
+
         return RsData.of(
                 modifyRs.getResultCode(),
                 modifyRs.getMsg(),
@@ -152,13 +183,13 @@ public class PostController {
         );
     }
 
+    // 게시글 삭제
     @AllArgsConstructor
     @Getter
     public static class DeleteResponse {
         private final Post post;
     }
-
-    // 게시글 삭제
+    
     @DeleteMapping(value = "/{postNo}")
     public RsData<DeleteResponse> delete(@PathVariable(name = "postNo") Integer postNo) {
         Optional<Post> opPost = postService.findByPostNo(postNo);

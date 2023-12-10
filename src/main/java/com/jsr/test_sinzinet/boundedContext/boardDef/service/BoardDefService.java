@@ -15,6 +15,7 @@ import java.util.Optional;
 public class BoardDefService {
     private final BoardDefRepository boardDefRepository;
 
+    // 게시판 분류 생성
     public RsData<BoardDef> create(String boardCd, String boardNm) {
         BoardDef boardDef = BoardDef.builder()
                 .boardCd(boardCd)
@@ -27,6 +28,7 @@ public class BoardDefService {
         );
     }
 
+    // 게시판 분류 코드로 조회
     public Optional<BoardDef> findByBoardCd(String boardCd) {
         return boardDefRepository.findByBoardCd(boardCd);
     }

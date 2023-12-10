@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class initData implements ApplicationRunner {
+    // 테스트를 위한 데이터입니다.
     private final BoardDefService boardDefService;
     private final PostService postService;
 

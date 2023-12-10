@@ -14,6 +14,7 @@ import java.util.Optional;
 public class TagService {
     private final TagRepository tagRepository;
 
+    // 태그 생성
     public RsData<Tag> create(BoardDef boardDef, String name) {
         Tag tag = Tag.builder()
                 .boardDef(boardDef)
@@ -26,6 +27,7 @@ public class TagService {
         );
     }
 
+    // 태그와 게시물 분류로 검색
     public Optional<Tag> findByTagAndBoardDef(String tag, BoardDef boardDef) {
         return tagRepository.findByTagAndBoardDef(tag, boardDef);
     }

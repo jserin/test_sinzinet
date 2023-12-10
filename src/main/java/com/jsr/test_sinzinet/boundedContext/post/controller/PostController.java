@@ -5,6 +5,9 @@ import com.jsr.test_sinzinet.boundedContext.boardDef.entity.BoardDef;
 import com.jsr.test_sinzinet.boundedContext.boardDef.service.BoardDefService;
 import com.jsr.test_sinzinet.boundedContext.post.entity.Post;
 import com.jsr.test_sinzinet.boundedContext.post.service.PostService;
+import com.jsr.test_sinzinet.boundedContext.postTag.service.PostTagService;
+import com.jsr.test_sinzinet.boundedContext.tag.entity.Tag;
+import com.jsr.test_sinzinet.boundedContext.tag.service.TagService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -24,6 +27,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class PostController {
     private final PostService postService;
     private final BoardDefService boardDefService;
+    private final TagService tagService;
+    private final PostTagService postTagService;
 
     //전체 글 내림차순 조회
     @AllArgsConstructor
@@ -72,6 +77,7 @@ public class PostController {
         private String postCn;
         @NotBlank
         private String regstrId;
+        private String[] tagName;
     }
 
     @AllArgsConstructor
@@ -87,6 +93,20 @@ public class PostController {
         RsData<Post> createRs = postService.create(boardDef, createRequest.getPostSj(), createRequest.getPostCn(), createRequest.getRegstrId());
 
         if (createRs.isFail()) return (RsData) createRs;
+
+        if (createRequest.tagName != null) {
+            for (String tag : createRequest.getTagName()) {
+                Optional<Tag> opTag = tagService.findByTagAndBoardDef(tag, boardDef);
+                if (opTag.isEmpty()){
+                    tagService.create(boardDef, tag);
+                }
+
+                Optional<Tag> exitTag = tagService.findByTagAndBoardDef(tag, boardDef);
+                if (exitTag.isPresent()) {
+                    postTagService.create(createRs.getData(), boardDef, exitTag.get());
+                }
+            }
+        }
 
         return RsData.of(
                 createRs.getResultCode(),

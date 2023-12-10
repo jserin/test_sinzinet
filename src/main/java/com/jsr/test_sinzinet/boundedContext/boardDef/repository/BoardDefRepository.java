@@ -1,7 +1,6 @@
 package com.jsr.test_sinzinet.boundedContext.boardDef.repository;
 
 import com.jsr.test_sinzinet.boundedContext.boardDef.entity.BoardDef;
-import com.jsr.test_sinzinet.boundedContext.post.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

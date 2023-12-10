@@ -2,17 +2,19 @@ package com.jsr.test_sinzinet.boundedContext.post.controller;
 
 import com.jsr.test_sinzinet.base.rsData.RsData;
 import com.jsr.test_sinzinet.boundedContext.boardDef.entity.BoardDef;
+import com.jsr.test_sinzinet.boundedContext.boardDef.service.BoardDefService;
 import com.jsr.test_sinzinet.boundedContext.post.entity.Post;
 import com.jsr.test_sinzinet.boundedContext.post.service.PostService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -21,7 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = "/posts", produces = APPLICATION_JSON_VALUE)
 public class PostController {
     private final PostService postService;
-
+    private final BoardDefService boardDefService;
 
     //전체 글 내림차순 조회
     @AllArgsConstructor
@@ -59,5 +61,74 @@ public class PostController {
                 "%d번 게시물은 존재하지 않습니다.".formatted(postNo),
                 null
         ));
+    }
+
+    // 게시글 작성하기
+    @Data
+    public static class CreateRequest {
+        @NotBlank
+        private String postSj;
+        @NotBlank
+        private String postCn;
+        @NotBlank
+        private String regstrId;
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public static class CreateResponse {
+        private final Post post;
+    }
+
+    @PostMapping(value = "/{boardCd}", consumes = APPLICATION_JSON_VALUE)
+    public RsData<CreateResponse> create(@PathVariable(name = "boardCd") String boardCd,
+                                       @Valid @RequestBody CreateRequest createRequest) {
+        BoardDef boardDef = boardDefService.findByBoardCd(boardCd).orElseThrow();
+        RsData<Post> createRs = postService.create(boardDef, createRequest.getPostSj(), createRequest.getPostCn(), createRequest.getRegstrId());
+
+        if (createRs.isFail()) return (RsData) createRs;
+
+        return RsData.of(
+                createRs.getResultCode(),
+                createRs.getMsg(),
+                new CreateResponse(createRs.getData())
+        );
+    }
+
+    // 게시글 수정
+    @Data
+    public static class ModifyRequest {
+        @NotBlank
+        private String postSj;
+        @NotBlank
+        private String postCn;
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public static class ModifyResponse {
+        private final Post post;
+    }
+
+    @PatchMapping(value = "/{postNo}", consumes = APPLICATION_JSON_VALUE)
+    public RsData<ModifyResponse> modify(
+            @Valid @RequestBody ModifyRequest modifyRequest,
+            @PathVariable(name = "postNo") Integer postNo
+    ) {
+        Optional<Post> opPost = postService.findByPostNo(postNo);
+
+        if (opPost.isEmpty()) return RsData.of(
+                "F-1",
+                "%d번 게시물은 존재하지 않습니다.".formatted(postNo),
+                null
+        );
+
+        RsData<Post> modifyRs = postService.modify(opPost.get(), modifyRequest.getPostSj(), modifyRequest.getPostCn());
+
+        return RsData.of(
+                modifyRs.getResultCode(),
+                modifyRs.getMsg(),
+                new ModifyResponse(modifyRs.getData())
+        );
     }
 }

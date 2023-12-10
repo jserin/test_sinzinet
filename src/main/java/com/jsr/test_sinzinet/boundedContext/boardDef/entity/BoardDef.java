@@ -1,5 +1,6 @@
 package com.jsr.test_sinzinet.boundedContext.boardDef.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jsr.test_sinzinet.boundedContext.post.entity.Post;
 import com.jsr.test_sinzinet.boundedContext.postTag.entity.PostTag;
 import com.jsr.test_sinzinet.boundedContext.tag.entity.Tag;
@@ -24,10 +25,13 @@ public class BoardDef {
     @Id
     private String boardCd;
     private String boardNm;
+    @JsonIgnore
     @OneToMany(mappedBy = "boardDef", cascade = CascadeType.REMOVE)
     private List<Post> postList = new ArrayList<>();
+    @JsonIgnore
     @OneToMany(mappedBy = "boardDef", cascade = CascadeType.REMOVE)
     private List<Tag> tagList = new ArrayList<>();
+    @JsonIgnore
     @OneToMany(mappedBy = "boardDef", cascade = CascadeType.REMOVE)
     private List<PostTag> postTagList = new ArrayList<>();
 }

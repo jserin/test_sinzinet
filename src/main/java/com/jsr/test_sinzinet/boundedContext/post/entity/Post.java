@@ -1,12 +1,13 @@
 package com.jsr.test_sinzinet.boundedContext.post.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jsr.test_sinzinet.boundedContext.boardDef.entity.BoardDef;
 import com.jsr.test_sinzinet.boundedContext.postTag.entity.PostTag;
 import com.jsr.test_sinzinet.boundedContext.tag.entity.Tag;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -34,6 +35,7 @@ public class Post {
     private String regstrId;
     @CreatedDate
     private LocalDateTime regDt;
+    @JsonIgnore
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<PostTag> postTagList = new ArrayList<>();
 }

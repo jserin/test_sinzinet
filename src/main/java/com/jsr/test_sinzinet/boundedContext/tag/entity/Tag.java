@@ -1,5 +1,6 @@
 package com.jsr.test_sinzinet.boundedContext.tag.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jsr.test_sinzinet.boundedContext.boardDef.entity.BoardDef;
 import com.jsr.test_sinzinet.boundedContext.postTag.entity.PostTag;
 import jakarta.persistence.*;
@@ -26,6 +27,7 @@ public class Tag {
     @ManyToOne
     @JoinColumn(name = "board_cd")
     private BoardDef boardDef;
+    @JsonIgnore
     @OneToMany(mappedBy = "tag", cascade = CascadeType.REMOVE)
     private List<PostTag> postTagList = new ArrayList<>();
 }

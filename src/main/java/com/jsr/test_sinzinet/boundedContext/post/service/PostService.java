@@ -26,6 +26,7 @@ public class PostService {
         return postRepository.findByPostNo(postNo);
     }
 
+    // 게시글 생성
     public RsData<Post> create(BoardDef boardDef, String postSj, String postCn, String regstrId) {
         Post post = Post.builder()
                 .boardDef(boardDef)
@@ -40,5 +41,19 @@ public class PostService {
                 "S-1","게시글 생성 완료", post
         );
     }
+
+    // 게시글 수정
+    public RsData<Post> modify(Post post, String postSj, String postCn) {
+        if (postSj != null) post.setPostSj(postSj);
+        if (postCn != null) post.setPostCn(postCn);
+        postRepository.save(post);
+
+        return RsData.of(
+                "S-1",
+                "%d번 게시물이 수정되었습니다.".formatted(post.getPostNo()),
+                post
+        );
+    }
+
 
 }

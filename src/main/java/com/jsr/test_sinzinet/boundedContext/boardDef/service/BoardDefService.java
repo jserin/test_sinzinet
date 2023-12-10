@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,5 +25,9 @@ public class BoardDefService {
         return RsData.of(
                 "S-1","게시판분류 생성 완료", boardDef
         );
+    }
+
+    public Optional<BoardDef> findByBoardCd(String boardCd) {
+        return boardDefRepository.findByBoardCd(boardCd);
     }
 }

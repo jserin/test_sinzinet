@@ -1,6 +1,8 @@
 package com.jsr.test_sinzinet.base;
 
+import com.jsr.test_sinzinet.boundedContext.boardDef.entity.BoardDef;
 import com.jsr.test_sinzinet.boundedContext.boardDef.service.BoardDefService;
+import com.jsr.test_sinzinet.boundedContext.post.entity.Post;
 import com.jsr.test_sinzinet.boundedContext.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
@@ -18,6 +20,7 @@ public class initData implements ApplicationRunner {
         boardDefService.create("분류1", "공지");
         boardDefService.create("분류2", "자유");
 
-        postService.create(null, "q", "w", "e");
+        BoardDef boardDef = boardDefService.findByBoardCd("분류1").orElseThrow();
+        postService.create(boardDef, "subject", "content", "user");
     }
 }

@@ -28,7 +28,7 @@ public class Post {
     @GeneratedValue(strategy = IDENTITY)
     private Integer postNo;
     @ManyToOne
-    @JoinColumn(name = "board_cd")
+    @PrimaryKeyJoinColumn(name = "board_cd")
     private BoardDef boardDef;
     private String postSj;
     private String postCn;

@@ -18,9 +18,5 @@
 <img src="https://img.shields.io/badge/github-000000?style=for-the-badge&logo=Java&logoColor=white">
 
 <br/>
-<br/>
-
-### 파일 구조
-test_sinzinet
 
 </div>
